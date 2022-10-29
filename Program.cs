@@ -36,15 +36,6 @@ builder.Services.AddDbContext<AppDbContext>(options => {
     options.UseNpgsql(defaultConnectionString);
 });
 
-var serviceProvider = builder.Services.BuildServiceProvider();
-try
-{
-    var dbContext = serviceProvider.GetRequiredService<AppDbContext>();
-    dbContext.Database.Migrate();
-}
-catch
-{
-}
 // Add services to the container.
 
 builder.Services.AddControllers();
@@ -53,8 +44,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
-// var scope = app.Services.CreateScope();
-// await DataHelper.ManageDataAsync(scope.ServiceProvider);
+var scope = app.Services.CreateScope();
+await DataHelper.ManageDataAsync(scope.ServiceProvider);
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
