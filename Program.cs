@@ -5,7 +5,9 @@ using ServerTask.Helper;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var defaultConnectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+var defaultConnectionString = builder.Configuration.GetConnectionString(ConnectionHelper.BuildConnectionString(databaseUrl));
+
 builder.Services.AddDbContext<AppDbContext>(options => {
     options.UseNpgsql(defaultConnectionString);
 });
