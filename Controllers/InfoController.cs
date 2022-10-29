@@ -27,7 +27,7 @@ namespace ServerTask.Controllers
             try
             {  
                  var result = await appDbContext.Infos.ToListAsync();
-                 return Ok(result);
+                 return Ok(result[0]);
             }  
             catch (Exception)
             {      
