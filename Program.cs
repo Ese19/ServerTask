@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Npgsql;
 using ServerTask.Data;
 using ServerTask.Helper;
 
@@ -13,18 +14,23 @@ if (builder.Environment.EnvironmentName == "Development") {
 else
 {
     // Use connection string provided at runtime.
-    var connectionUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+    var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
 
-    connectionUrl = connectionUrl.Replace("postgres://", string.Empty);
-    var userPassSide = connectionUrl.Split("@")[0];
-    var hostSide = connectionUrl.Split("@")[1];
+    var databaseUri = new Uri(databaseUrl);
+    var userInfo = databaseUri.UserInfo.Split(':');
+    var test = new NpgsqlConnectionStringBuilder
+    {
+        Host = databaseUri.Host,
+        Port = databaseUri.Port,
+        Username = userInfo[0],
+        Password = userInfo[1],
+        Database = databaseUri.LocalPath.TrimStart('/'),
+        SslMode = SslMode.Require,
+        TrustServerCertificate = true
+    };
+    
 
-    var user = userPassSide.Split(":")[0];
-    var password = userPassSide.Split(":")[1];
-    var host = hostSide.Split("/")[0];
-    var database = hostSide.Split("/")[1].Split("?")[0];
-
-    defaultConnectionString = $"Host={host};Database={database};Username={user};Password={password};SSL Mode=Require;Trust Server Certificate=true";
+    defaultConnectionString = test.ToString();
 }
 
 
